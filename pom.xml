@@ -74,5 +74,6 @@
 		<module>eureka-server</module>
 		<module>clients</module>
 		<module>notification</module>
+		<module>api-gateway</module>
 	</modules>
 </project>
