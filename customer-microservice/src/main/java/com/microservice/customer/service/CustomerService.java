@@ -2,10 +2,10 @@ package com.microservice.customer.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.microservice.amqp.RabbitMqMessageProducer;
 import com.microservice.clients.fraud.FraudClient;
 import com.microservice.clients.model.FraudCheckResponse;
 import com.microservice.clients.model.NotificationRequest;
-import com.microservice.clients.notification.NotificationClient;
 import com.microservice.customer.model.Customer;
 import com.microservice.customer.model.CustomerRegistrationRequest;
 import com.microservice.customer.repository.CustomerRepository;
@@ -15,15 +15,17 @@ public class CustomerService {
 
   private final CustomerRepository customerRepository;
   private final FraudClient fraudClient;
-  private final NotificationClient notificationClient;
+  private final RabbitMqMessageProducer messageProducer;
 
 
-  public CustomerService(@Autowired CustomerRepository customerRepository,
-      @Autowired FraudClient fraudClient, NotificationClient notificationClient) {
+  @Autowired
+  public CustomerService(CustomerRepository customerRepository, FraudClient fraudClient,
+      RabbitMqMessageProducer messageProducer) {
 
     this.customerRepository = customerRepository;
     this.fraudClient = fraudClient;
-    this.notificationClient = notificationClient;
+    this.messageProducer = messageProducer;
+
   }
 
   public void registerCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
@@ -42,7 +44,7 @@ public class CustomerService {
     NotificationRequest request = new NotificationRequest("Registered successfully",
         customer.getEmail(), "Admin", customer.getId());
 
-    notificationClient.sendNotification(request);
+    messageProducer.publish(request, "internal.exchange", "interntal.notification.routing-key");
   }
 
 }
