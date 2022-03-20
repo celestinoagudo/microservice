@@ -3,10 +3,20 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<groupId>com.microservice.app</groupId>
 	<artifactId>microservice-app</artifactId>
+	<packaging>pom</packaging>
 	<version>1.0-SNAPSHOT</version>
+
+	<modules>
+		<module>customer-microservice</module>
+		<module>fraud-microservice</module>
+		<module>eureka-server</module>
+		<module>clients</module>
+		<module>notification</module>
+		<module>api-gateway</module>
+		<module>amqp</module>
+	</modules>
 
 	<name>microserviceapp</name>
 
@@ -62,19 +72,26 @@
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-maven-plugin</artifactId>
 					<version>${spring.boot.maven.plugin.version}</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>repackage</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.10.1</version>
+				<configuration>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
-
-	<packaging>pom</packaging>
-	<modules>
-		<module>customer-microservice</module>
-		<module>fraud-microservice</module>
-		<module>eureka-server</module>
-		<module>clients</module>
-		<module>notification</module>
-		<module>api-gateway</module>
-		<module>amqp</module>
-	</modules>
 </project>
