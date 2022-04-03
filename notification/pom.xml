@@ -9,7 +9,7 @@
 	<artifactId>notification</artifactId>
 	<packaging>jar</packaging>
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -18,6 +18,20 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>build-docker-image</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.google.cloud.tools</groupId>
+						<artifactId>jib-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<dependencies>
 		<dependency>
