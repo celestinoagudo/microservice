@@ -1,4 +1,32 @@
 services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: msuser
+      POSTGRES_PASSWORD: mspassword
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - postgres
+    restart: unless-stopped
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
@@ -13,6 +41,8 @@ services:
     ports:
       - "5672:5672" # for microservices
       - "15672:15672" # for management port
+    networks:
+      - spring
   eureka-server:
     image: celestinosdockeracct/eureka-server:latest
     container_name: eureka-server
@@ -45,10 +75,12 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - spring
+      - postgres
     depends_on:
       - zipkin
       - eureka-server
       - rabbitmq
+      - postgres
   fraud-microservice:
     image: celestinosdockeracct/fraud-microservice:latest
     container_name: fraud-microservice
@@ -58,10 +90,12 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - spring
+      - postgres
     depends_on:
       - zipkin
       - eureka-server
       - rabbitmq
+      - postgres
   notification:
     image: celestinosdockeracct/notification:latest
     container_name: notification
@@ -71,10 +105,18 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - spring
+      - postgres
     depends_on:
       - zipkin
       - eureka-server
       - rabbitmq
+      - postgres
 networks:
+  postgres: 
+    driver: bridge
   spring: 
     driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:
